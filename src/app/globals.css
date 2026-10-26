@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* Design tokens. Warm paper background, near-black ink, one muted green accent. */
+@theme {
+  --color-paper: #faf8f4;
+  --color-surface: #fffefb;
+  --color-ink: #1f1d1a;
+  --color-muted: #6e6a62;
+  --color-line: #e3ded3;
+  --color-line-strong: #cfc8b9;
+  --color-brand-50: #eef3ef;
+  --color-brand-100: #d9e4dc;
+  --color-brand-500: #3f7a63;
+  --color-brand-600: #2f5d4c;
+  --color-brand-700: #244a3c;
+  --color-danger: #9b2c2c;
+
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+  h1,
+  h2 {
+    @apply font-serif;
+  }
+  ::selection {
+    @apply bg-brand-100;
+  }
+}
+
+/* Reusable component styles. In Tailwind v4, @utility makes a class usable like
+   any built-in one, e.g. className="btn-primary". */
+@utility card {
+  @apply rounded-md border border-line bg-surface;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-medium transition-colors
+    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500
+    disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700;
+}
+@utility btn-secondary {
+  @apply btn border border-line-strong bg-transparent text-ink hover:bg-brand-50;
+}
+@utility btn-danger {
+  @apply btn border border-transparent bg-transparent text-danger hover:underline;
+}
+@utility btn-sm {
+  @apply px-1.5 py-0.5 text-sm;
+}
+@utility link {
+  @apply text-brand-600 underline decoration-brand-100 underline-offset-4 transition-colors hover:decoration-brand-600;
+}
+@utility input {
+  @apply w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-sm
+    placeholder:text-muted/60 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none
+    aria-invalid:border-danger aria-invalid:focus:ring-red-100;
+}
+@utility field-label {
+  @apply mb-1.5 block text-sm text-muted;
+}

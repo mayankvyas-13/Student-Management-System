@@ -1,0 +1,57 @@
+// Database schema - the single description of our tables.
+// Prisma reads this file to generate a fully typed client (`npm install` runs `prisma generate`).
+// The SQL that creates these tables lives in prisma/migrations/.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Lifecycle of a student record.
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+}
+
+/// Academic department, e.g. "CSE - Computer Science and Engineering".
+/// Kept as its own table (not a free-text column on students) so names are
+/// consistent, can be renamed in one place, and can be listed in dropdowns.
+model Department {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(10)
+  name      String    @unique @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  students  Student[]
+
+  @@map("departments")
+}
+
+model Student {
+  /// UUIDs are not guessable and can be generated without a round-trip to the DB.
+  id             String        @id @default(uuid()) @db.Uuid
+  /// Institution-issued identifier, e.g. "2026CSE001". Unique, stored upper-case.
+  rollNumber     String        @unique @map("roll_number") @db.VarChar(20)
+  firstName      String        @map("first_name") @db.VarChar(50)
+  lastName       String        @map("last_name") @db.VarChar(50)
+  /// Unique, stored lower-case so "A@x.com" and "a@x.com" count as the same address.
+  email          String        @unique @db.VarChar(254)
+  phone          String?       @db.VarChar(20)
+  dateOfBirth    DateTime?     @map("date_of_birth") @db.Date
+  admissionYear  Int           @map("admission_year") @db.SmallInt
+  status         StudentStatus @default(ACTIVE)
+  departmentId   Int           @map("department_id")
+  /// onDelete: Restrict - a department that still has students cannot be deleted.
+  department     Department    @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([departmentId])
+  @@index([status])
+  @@index([lastName, firstName])
+  @@map("students")
+}
